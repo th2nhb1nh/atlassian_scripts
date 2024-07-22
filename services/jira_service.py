@@ -39,3 +39,9 @@ class JiraService(BaseService):
     def get_user(self, query):
         url = self._build_url(f"rest/api/3/user?accountId={query}&expand=applicationRoles", True)
         return self.get(url, headers=self.headers)
+
+    def get_all_addons(self, route):
+        marketplace_url = "https://marketplace.atlassian.com"
+        url = f"{marketplace_url}/{route}"
+        print(url)
+        return self.get(url, headers=self.headers)

@@ -7,8 +7,8 @@ load_dotenv(override=True)
 
 class JiraConfig:
     URL = os.getenv("URL")
-    EMAIL = os.getenv("JIRA_EMAIL")
-    API_KEY = os.getenv("JIRA_API_TOKEN")
+    EMAIL = os.getenv("EMAIL")
+    API_KEY = os.getenv("API_KEY")
     TOKEN = encode_base64(f"{EMAIL}:{API_KEY}")
     HEADERS = {
         "Authorization": f"Basic {TOKEN}",
