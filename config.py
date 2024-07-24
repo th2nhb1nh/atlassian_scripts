@@ -6,7 +6,8 @@ from utils.string_handling import encode_base64
 load_dotenv(override=True)
 
 class JiraConfig:
-    URL = os.getenv("URL")
+    JIRA_URL = os.getenv("JIRA_URL")
+    MARKETPLACE_URL = os.getenv("MARKETPLACE_URL")
     EMAIL = os.getenv("EMAIL")
     API_KEY = os.getenv("API_KEY")
     TOKEN = encode_base64(f"{EMAIL}:{API_KEY}")
