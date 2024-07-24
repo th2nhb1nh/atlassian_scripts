@@ -1,14 +1,15 @@
 # marketplace_get_all_addons.py
 import json
+from collections import defaultdict
 from pathlib import Path
 from services.jira_service import JiraService
-from services.base_service import BaseService
 from utils.file_utils import write_json_to_file
 from utils.string_handling import get_initials
 
 class MarketplaceAddonFetcher:
     def __init__(self):
         self.jira_service = JiraService()
+        self.existing_codes = set()
 
     def fetch_addons(self, application):
         addons = []
@@ -26,13 +27,10 @@ class MarketplaceAddonFetcher:
 
         return addons
 
-    def handle_addon_code(self, name):
-        return get_initials(name)
-
     def parse_addon_details(self, addons, application):
         parsed_addons = []
         for addon in addons:
-            product_code = self.handle_addon_code(addon.get("name", ""))
+            product_code = get_initials(addon.get("name", ""), self.existing_codes)
             parsed_addons.append({
                 "Name": addon.get("name"),
                 "Id": addon.get("id"),
@@ -45,6 +43,19 @@ class MarketplaceAddonFetcher:
             })
         return parsed_addons
 
+    def check_duplicates(self, addons):
+        code_count = defaultdict(list)
+        for addon in addons:
+            code_count[addon["Item Code"]].append(addon["Name"])
+        
+        duplicates = {code: names for code, names in code_count.items() if len(names) > 1}
+        if duplicates:
+            print("Found duplicate product codes:")
+            for code, names in duplicates.items():
+                print(f"Code: {code} is used by: {names}")
+        else:
+            print("No duplicate product codes found.")
+
     def save_addons_to_files(self, file_prefix):
         applications = ["jira", "confluence"]
         all_addons = []
@@ -55,6 +66,8 @@ class MarketplaceAddonFetcher:
             all_addons.extend(parsed_addons)
             app_count = len(parsed_addons)
             print(f"Total fetched addons for {application}: {app_count}")
+
+        self.check_duplicates(all_addons)
 
         total_count = len(all_addons)
         print(f"Success: All {total_count} addons have been fetched and will be saved in multiple files.")
