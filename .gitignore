@@ -165,3 +165,4 @@ data/
 *.json
 *.csv
 info.md
+prompt.md

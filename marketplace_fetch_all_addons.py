@@ -10,6 +10,7 @@ class MarketplaceAddonFetcher:
     def __init__(self):
         self.jira_service = JiraService()
         self.existing_codes = set()
+        self.failed_addons = []
 
     def fetch_addons(self, application):
         addons = []
@@ -27,10 +28,24 @@ class MarketplaceAddonFetcher:
 
         return addons
 
+    def handle_addon_code(self, name, product_group):
+        return get_initials(name, self.existing_codes, product_group)
+
     def parse_addon_details(self, addons, application):
         parsed_addons = []
         for addon in addons:
-            product_code = get_initials(addon.get("name", ""), self.existing_codes)
+            product_code = self.handle_addon_code(addon.get("name", ""), application)
+            if not product_code:
+                self.failed_addons.append({
+                    "Name": addon.get("name"),
+                    "Id": addon.get("id"),
+                    "Summary": addon.get("summary"),
+                    "Tag Line": addon.get("tagLine"),
+                    "Product Group": application,
+                    "Categories": [cat.get("name") for cat in addon["_embedded"]["categories"]]
+                })
+                continue
+            print(product_code)
             parsed_addons.append({
                 "Name": addon.get("name"),
                 "Id": addon.get("id"),
@@ -77,6 +92,11 @@ class MarketplaceAddonFetcher:
             output_file = f"{file_prefix}_{i // 100 + 1}.json"
             write_json_to_file(output_file, all_addons[i:i + 100])
             print(f"Saved {len(all_addons[i:i + 100])} addons to {output_file}")
+
+        # Save failed addons to a new file
+        failed_output_file = "data/failed_addons.json"
+        write_json_to_file(failed_output_file, self.failed_addons)
+        print(f"Saved {len(self.failed_addons)} failed addons to {failed_output_file}")
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()

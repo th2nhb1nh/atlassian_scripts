@@ -1,57 +1,107 @@
 # utils/string_handling.py
 import base64
-import re
 import random
+import re
 
 def encode_base64(string):
     return base64.b64encode(string.encode('utf-8')).decode('utf-8')
 
-def split_into_morphemes(word):
-    # A very basic heuristic to split words into possible morphemes
-    # This should be replaced by a more sophisticated NLP-based approach if available
-    common_roots = ['work', 'log', 'conflu', 'table', 'form', 'survey', 'chart', 'filter', 'spreadsheet', 'menu', 'bot', 'draw']
-    morphemes = []
-    remaining = word.lower()
+def is_duplicate(initials, existing_codes):
+    return initials in existing_codes
 
-    for root in common_roots:
-        if root in remaining:
-            morphemes.append(root)
-            remaining = remaining.replace(root, '', 1)
-    
-    # If remaining is not empty, add it as a separate morpheme
-    if remaining:
-        morphemes.append(remaining)
+def get_random_letters(string, count, exclude_indices):
+    available_indices = [i for i in range(len(string)) if i not in exclude_indices]
+    return ''.join(string[i] for i in random.sample(available_indices, count))
 
-    return morphemes
+def handle_one_word(words, product_group, existing_codes):
+    first_two = words[0][:2]
+    # product_letter = product_group[0].upper()
+    last_two = words[0][-2:]
+    # random_letters = get_random_letters(words[0], 2, {0, 1})
+    potential_initials = [
+        first_two + product_group[:2],
+        # first_two + product_letter,
+        first_two + last_two,
+        # first_two + random_letters
+    ]
 
-def get_initials(string, existing_codes):
-    # Remove non-letter characters and split the string into words
-    words = re.sub(r'[^a-zA-Z\s]', '', string).split()
+    for initials in potential_initials:
+        if not is_duplicate(initials, existing_codes):
+            existing_codes.add(initials)
+            return initials
+    return None
 
-    morphemes = []
-    for word in words:
-        morphemes.extend(split_into_morphemes(word))
+def handle_two_words(words, product_group, existing_codes):
+    first_two = words[0][:2]
+    initials = ''.join(word[0].upper() for word in words)
+    last_two = words[1][-2:]
+    random_letters = get_random_letters(''.join(words), 2, {0, 1, len(words[0])})
+    # product_letter = product_group[0].upper()
+    potential_initials = [
+        first_two + product_group[:2],
+        initials[0] + initials[1] + last_two,
+        first_two + random_letters
+    ]
 
-    # Generate initials using the first character of up to the first three morphemes
-    if len(morphemes) >= 3:
-        initials = ''.join(morpheme[0].upper() for morpheme in morphemes[:3])
+    for initials in potential_initials:
+        if not is_duplicate(initials, existing_codes):
+            existing_codes.add(initials)
+            return initials
+    return None
+
+def handle_three_words(words, existing_codes):
+    initials = ''.join(word[0].upper() for word in words)
+    last_two = words[-1][-2:]
+    last_char = words[-1][-1]
+    random_letters = get_random_letters(''.join(words), 2, {0, 1, 2})
+    potential_initials = [
+        initials,
+        initials[0] + initials[1] + last_two,
+        initials[0] + initials[1] + initials[2] + last_char,
+        words[0][:2] + random_letters
+    ]
+
+    for initials in potential_initials:
+        if not is_duplicate(initials, existing_codes):
+            existing_codes.add(initials)
+            return initials
+    return None
+
+def handle_four_or_more_words(words, existing_codes):
+    first_three = ''.join(word[0].upper() for word in words[:3])
+    first_four = ''.join(word[0].upper() for word in words[:4])
+    last_two = words[-1][-2:]
+    random_letters = get_random_letters(''.join(words), 2, {0, 1, 2})
+    potential_initials = [
+        first_four,
+        first_three + last_two,
+        words[0][:2] + random_letters
+    ]
+
+    for initials in potential_initials:
+        if not is_duplicate(initials, existing_codes):
+            existing_codes.add(initials)
+            return initials
+    return None
+
+def get_initials(string, existing_codes, product_group):
+    words = re.findall(r"[\w']+", string)
+    # Remove "for" and "to" from words
+    words = [word for word in words if word.lower() not in ['for', 'to', 'and', 'with', 'by']]
+    print(words)
+    print(len(words))
+
+    if len(words) == 1:
+        initials = handle_one_word(words, product_group, existing_codes)
+    elif len(words) == 2:
+        initials = handle_two_words(words, product_group, existing_codes)
+    elif len(words) == 3:
+        initials = handle_three_words(words, existing_codes)
     else:
-        initials = ''.join(morpheme[0].upper() for morpheme in morphemes)
-    
-    # Ensure the initials are 3 characters long
-    if len(initials) < 3:
-        cleaned_string = ''.join(re.findall(r'[A-Za-z]', string)).upper()
-        initials += cleaned_string[len(initials):len(initials) + (3 - len(initials))]
+        initials = handle_four_or_more_words(words, existing_codes)
+    print(initials)
 
-    # Ensure the initials are unique
-    cleaned_string = ''.join(re.findall(r'[A-Za-z]', string)).upper()  # Clean the string to remove non-letter characters
-    if initials in existing_codes:
-        while initials in existing_codes:
-            first_char = cleaned_string[0]
-            remaining_chars = cleaned_string[1:]
-            random_start = random.randint(0, len(remaining_chars) - 2)
-            additional_chars = remaining_chars[random_start:random_start + 2]
-            initials = first_char + additional_chars
+    if not initials:
+        return None
 
-    existing_codes.add(initials)
-    return initials
+    return initials.upper()
