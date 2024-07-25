@@ -1,5 +1,5 @@
-# process_addons_data.py
 import json
+import re
 from collections import defaultdict
 from utils.file_utils import write_json_to_file, read_json
 from utils.string_handling import get_initials
@@ -12,24 +12,32 @@ class AddonCodeProcessor:
     def handle_addon_code(self, name, product_group):
         return get_initials(name, self.existing_codes, product_group)
 
-    def parse_addon_details(self, addons):
-        parsed_addons = []
+    def categorize_addons(self, addons):
+        categorized_addons = defaultdict(list)
         for addon in addons:
-            application = addon.get("Product Group", "")
-            addon_name = addon.get("Name", "")
-            product_code = self.handle_addon_code(addon_name, application)
-            if not product_code:
-                self.failed_addons.append(addon)
-                continue
-            parsed_addons.append({
-                "Name": addon.get("Name"),
-                "Id": addon.get("Id"),
-                "Summary": addon.get("Summary"),
-                "Tag Line": addon.get("Tag Line"),
-                "Product Group": addon.get("Product Group"),
-                "Item Code": f"LIC-C-{product_code}-A",
-                "Categories": addon.get("Categories", [])
-            })
+            words = len(re.findall(r"[\w']+", addon.get("Name", "")))
+            categorized_addons[words].append(addon)
+        return categorized_addons
+
+    def parse_addon_details(self, categorized_addons):
+        parsed_addons = []
+        for category in sorted(categorized_addons.keys()):
+            for addon in categorized_addons[category]:
+                application = addon.get("Product Group", "")
+                addon_name = addon.get("Name", "")
+                product_code = self.handle_addon_code(addon_name, application)
+                if not product_code:
+                    self.failed_addons.append(addon)
+                    continue
+                parsed_addons.append({
+                    "Name": addon.get("Name"),
+                    "Id": addon.get("Id"),
+                    "Summary": addon.get("Summary"),
+                    "Tag Line": addon.get("Tag Line"),
+                    "Product Group": addon.get("Product Group"),
+                    "Item Code": f"LIC-C-{product_code}-A",
+                    "Categories": addon.get("Categories", [])
+                })
         return parsed_addons
 
     def check_duplicates(self, addons):
@@ -47,7 +55,8 @@ class AddonCodeProcessor:
 
     def process_addons(self, input_file, file_prefix):
         addons = read_json(input_file)
-        parsed_addons = self.parse_addon_details(addons)
+        categorized_addons = self.categorize_addons(addons)
+        parsed_addons = self.parse_addon_details(categorized_addons)
         self.check_duplicates(parsed_addons)
 
         total_count = len(parsed_addons)
