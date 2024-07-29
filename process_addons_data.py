@@ -1,11 +1,14 @@
+# process_addons_data.py
 import json
 import re
 from collections import defaultdict
+from services.jira_service import JiraService
 from utils.file_utils import write_json_to_file, read_json
 from utils.string_handling import get_initials
 
 class AddonCodeProcessor:
     def __init__(self):
+        self.jira_service = JiraService()
         self.existing_codes = set()
         self.failed_addons = []
 
@@ -32,6 +35,7 @@ class AddonCodeProcessor:
                 parsed_addons.append({
                     "Name": addon.get("Name"),
                     "Id": addon.get("Id"),
+                    "Link": addon.get("Link"),
                     "Summary": addon.get("Summary"),
                     "Tag Line": addon.get("Tag Line"),
                     "Product Group": addon.get("Product Group"),
@@ -65,7 +69,8 @@ class AddonCodeProcessor:
         # Break the output into new files per 100 records
         for i in range(0, total_count, 100):
             output_file = f"{file_prefix}_{i // 100 + 1}.json"
-            write_json_to_file(output_file, parsed_addons[i:i + 100])
+            output = {"body":parsed_addons[i:i + 100]}
+            write_json_to_file(output_file, output)
             print(f"Saved {len(parsed_addons[i:i + 100])} addons to {output_file}")
 
         # Save failed addons to a new file

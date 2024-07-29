@@ -26,7 +26,7 @@ def handle_one_word(words, product_group, existing_codes):
         first_two + last_two,
         initials + last_char + product_code,
         first_four,
-        first_three + product_group[:1].upper()
+        # first_three + product_group[:1].upper()
     ]
     print(potential_initials)
 
@@ -37,15 +37,17 @@ def handle_one_word(words, product_group, existing_codes):
 
 def handle_two_words(words, product_group, existing_codes):
     first_two = words[0][:2]
+    first_four = ''.join(word[0].upper() for word in words[:4])
     product_code = product_group[:2].upper()
     initials = ''.join(word[0].upper() for word in words)
     last_two = words[1][-2:]
     random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, len(words[0])})
     potential_initials = [
         first_two + product_code,
+        first_four,
         initials[0] + initials[1] + last_two,
         initials[0] + initials[1] + product_code
-    ] + [first_two + comb for comb in random_combinations]
+    ] + [initials[0] + initials[1] + comb for comb in random_combinations]
     print(potential_initials)
 
     for initials in potential_initials:
@@ -53,14 +55,18 @@ def handle_two_words(words, product_group, existing_codes):
             return initials
     return None
 
-def handle_three_words(words, existing_codes):
+def handle_three_words(words, product_group, existing_codes):
     initials = ''.join(word[0].upper() for word in words)
+    first_four = ''.join(word[0].upper() for word in words[:4])
+    product_code = product_group[:2].upper()
     last_two = words[-1][-2:]
     last_char = words[-1][-1]
     random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, 2})
     potential_initials = [
         initials + last_char,
-        initials[0] + initials[1] + last_two
+        first_four,
+        initials[0] + initials[1] + last_two,
+        initials[0] + initials[1] + product_code
     ] + [initials[0] + initials[1] + comb for comb in random_combinations]
     print(potential_initials)
 
@@ -69,19 +75,21 @@ def handle_three_words(words, existing_codes):
             return initials
     return None
 
-def handle_four_or_more_words(words, existing_codes):
+def handle_four_or_more_words(words, product_group, existing_codes):
     initials = ''.join(word[0].upper() for word in words)
     first_three = ''.join(word[0].upper() for word in words[:3])
     first_four = ''.join(word[0].upper() for word in words[:4])
+    product_code = product_group[:2].upper()
     last_two = words[-1][-2:]
     last_char = words[-1][-1]
     random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, 2})
     potential_initials = [
         first_four,
-        first_three + last_char,
-        initials[0] + initials[1] + last_two
+        # first_three + last_char,
+        initials[0] + initials[1] + initials[2] + initials[3],
+        initials[0] + initials[1] + last_two,
+        initials[0] + initials[1] + product_code
     ] + [initials[0] + initials[1] + comb for comb in random_combinations]
-    print(potential_initials)
 
     for initials in potential_initials:
         if not is_duplicate(initials, existing_codes):
@@ -91,19 +99,19 @@ def handle_four_or_more_words(words, existing_codes):
 def get_initials(string, existing_codes, product_group):
     words = re.findall(r"[\w']+", string.upper())
     words = [word for word in words if word not in ['FOR', 'TO', 'AND', 'WITH', 'BY']]
-    print(f"Processing words: {words} with product group: {product_group}")
 
     if len(words) == 1:
         initials = handle_one_word(words, product_group, existing_codes)
     elif len(words) == 2:
         initials = handle_two_words(words, product_group, existing_codes)
     elif len(words) == 3:
-        initials = handle_three_words(words, existing_codes)
+        initials = handle_three_words(words, product_group, existing_codes)
     else:
-        initials = handle_four_or_more_words(words, existing_codes)
+        initials = handle_four_or_more_words(words, product_group, existing_codes)
     
     if initials and not is_duplicate(initials, existing_codes):
         existing_codes.add(initials)
+        print(f"Addon: {words} with item code: {initials}")
         return initials.upper()
     else:
         print(f"Could not generate unique initials for: {words}")

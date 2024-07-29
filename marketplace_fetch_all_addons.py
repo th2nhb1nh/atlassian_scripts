@@ -1,9 +1,10 @@
 # marketplace_get_all_addons.py
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from services.jira_service import JiraService
-from utils.file_utils import write_json_to_file
+from utils.file_utils import write_json_to_file, read_json
 from utils.string_handling import get_initials
 
 class MarketplaceAddonFetcher:
@@ -39,17 +40,17 @@ class MarketplaceAddonFetcher:
                 self.failed_addons.append({
                     "Name": addon.get("name"),
                     "Id": addon.get("id"),
+                    "Link": f"{self.jira_service.marketplace_url}{addon['_links']['alternate']['href']}",
                     "Summary": addon.get("summary"),
                     "Tag Line": addon.get("tagLine"),
                     "Product Group": application,
                     "Categories": [cat.get("name") for cat in addon["_embedded"]["categories"]]
                 })
                 continue
-            print(product_code)
             parsed_addons.append({
                 "Name": addon.get("name"),
                 "Id": addon.get("id"),
-                # "Key": addon.get("key"),
+                "Link": f"{self.jira_service.marketplace_url}{addon['_links']['alternate']['href']}",
                 "Summary": addon.get("summary"),
                 "Tag Line": addon.get("tagLine"),
                 "Product Group": application,

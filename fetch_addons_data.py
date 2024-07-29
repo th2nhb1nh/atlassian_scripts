@@ -34,6 +34,7 @@ class MarketplaceAddonFetcher:
                 all_addons.append({
                     "Name": addon.get("name"),
                     "Id": addon.get("id"),
+                    "Link": f"{self.jira_service.marketplace_url}{addon["_links"]["alternate"]["href"]}",
                     "Summary": addon.get("summary"),
                     "Tag Line": addon.get("tagLine"),
                     "Product Group": application,
