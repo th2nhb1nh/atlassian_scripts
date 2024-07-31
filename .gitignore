@@ -167,3 +167,5 @@ data/
 info.md
 prompt.md
 *.zip
+log
+logs
