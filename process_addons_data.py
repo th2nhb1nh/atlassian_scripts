@@ -57,7 +57,7 @@ class AddonCodeProcessor:
         else:
             print("No duplicate product codes found.")
 
-    def process_addons(self, input_file, file_prefix):
+    def process_addons(self, input_file, file_prefix, chunk_size):
         addons = read_json(input_file)
         categorized_addons = self.categorize_addons(addons)
         parsed_addons = self.parse_addon_details(categorized_addons)
@@ -66,12 +66,12 @@ class AddonCodeProcessor:
         total_count = len(parsed_addons)
         print(f"Success: All {total_count} addons have been processed and will be saved in multiple files.")
 
-        # Break the output into new files per 100 records
-        for i in range(0, total_count, 100):
-            output_file = f"{file_prefix}_{i // 100 + 1}.json"
-            output = {"body":parsed_addons[i:i + 100]}
+        # Break the output into new files per chunk_size records
+        for i in range(0, total_count, chunk_size):
+            output_file = f"{file_prefix}_{i // chunk_size + 1}.json"
+            output = {"body":parsed_addons[i:i + chunk_size]}
             write_json_to_file(output_file, output)
-            print(f"Saved {len(parsed_addons[i:i + 100])} addons to {output_file}")
+            print(f"Saved {len(parsed_addons[i:i + chunk_size])} addons to {output_file}")
 
         # Save failed addons to a new file
         failed_output_file = "data/failed_addons.json"
@@ -80,4 +80,4 @@ class AddonCodeProcessor:
 
 if __name__ == "__main__":
     processor = AddonCodeProcessor()
-    processor.process_addons("data/raw_addon_details.json", "data/addon_details")
+    processor.process_addons("data/raw_addon_details.json", "data/addon_details", chunk_size=500)
