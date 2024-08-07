@@ -1,12 +1,19 @@
 # file_utils.py
 import json
 import csv
+import os
+
+def ensure_directory_exists(file_path):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 def read_csv(csv_path):
     with open(csv_path, mode='r', encoding='utf-8') as csv_file:
         return list(csv.DictReader(csv_file))
 
 def write_csv_to_file(file_path, data, fieldnames):
+    ensure_directory_exists(file_path)
     with open(file_path, mode='w', encoding='utf-8', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
@@ -22,6 +29,7 @@ def read_json(file_path):
         return None
 
 def write_json_to_file(file_path, data):
+    ensure_directory_exists(file_path)
     try:
         with open(file_path, mode='w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
