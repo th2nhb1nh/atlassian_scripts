@@ -2,7 +2,6 @@
 import json
 import re
 from collections import defaultdict
-from pathlib import Path
 from services.jira_service import JiraService
 from utils.file_utils import write_json_to_file, read_json
 from utils.string_handling import get_initials
@@ -72,7 +71,7 @@ class MarketplaceAddonFetcher:
         else:
             print("No duplicate product codes found.")
 
-    def save_addons_to_files(self, file_prefix):
+    def save_addons_to_files(self, file_prefix, chunk_size):
         applications = ["jira", "confluence"]
         all_addons = []
 
@@ -88,11 +87,11 @@ class MarketplaceAddonFetcher:
         total_count = len(all_addons)
         print(f"Success: All {total_count} addons have been fetched and will be saved in multiple files.")
 
-        # Break the output into new files per 100 records
-        for i in range(0, total_count, 100):
-            output_file = f"{file_prefix}_{i // 100 + 1}.json"
-            write_json_to_file(output_file, all_addons[i:i + 100])
-            print(f"Saved {len(all_addons[i:i + 100])} addons to {output_file}")
+        # Break the output into new files per chunk_size records
+        for i in range(0, total_count, chunk_size):
+            output_file = f"{file_prefix}_{i // chunk_size + 1}.json"
+            write_json_to_file(output_file, all_addons[i:i + chunk_size])
+            print(f"Saved {len(all_addons[i:i + chunk_size])} addons to {output_file}")
 
         # Save failed addons to a new file
         failed_output_file = "data/failed_addons.json"
@@ -101,4 +100,4 @@ class MarketplaceAddonFetcher:
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()
-    fetcher.save_addons_to_files("data/addon_details")
+    fetcher.save_addons_to_files("data/addon_details", chunk_size=100)
