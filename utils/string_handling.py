@@ -28,7 +28,6 @@ def handle_one_word(words, product_group, existing_codes):
         first_four,
         # first_three + product_group[:1].upper()
     ]
-    print(potential_initials)
 
     for initials in potential_initials:
         if not is_duplicate(initials, existing_codes):
@@ -48,7 +47,6 @@ def handle_two_words(words, product_group, existing_codes):
         initials[0] + initials[1] + last_two,
         initials[0] + initials[1] + product_code
     ] + [initials[0] + initials[1] + comb for comb in random_combinations]
-    print(potential_initials)
 
     for initials in potential_initials:
         if not is_duplicate(initials, existing_codes):
@@ -68,7 +66,6 @@ def handle_three_words(words, product_group, existing_codes):
         initials[0] + initials[1] + last_two,
         initials[0] + initials[1] + product_code
     ] + [initials[0] + initials[1] + comb for comb in random_combinations]
-    print(potential_initials)
 
     for initials in potential_initials:
         if not is_duplicate(initials, existing_codes):
