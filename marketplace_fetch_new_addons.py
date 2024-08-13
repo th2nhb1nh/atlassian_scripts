@@ -1,11 +1,129 @@
-# marketplace_get_all_addons.py
-import json
+# marketplace_fetch_new_addons.py
+import base64
+import itertools
 import re
+import json
 from collections import defaultdict
 from services.jira_service import JiraService
-from utils.file_utils import write_json_to_file, read_json
-from utils.string_handling import get_initials
+from utils.file_utils import write_json_to_file
 
+# String handling functions
+def encode_base64(string):
+    return base64.b64encode(string.encode('utf-8')).decode('utf-8')
+
+def is_duplicate(initials, existing_codes):
+    return initials in existing_codes
+
+def get_all_random_combinations(string, count, exclude_indices):
+    available_chars = [string[i] for i in range(len(string)) if i not in exclude_indices]
+    return [''.join(comb) for comb in itertools.combinations(available_chars, count)]
+
+def handle_one_word(words, product_group, existing_codes):
+    initials = ''.join(word[0].upper() for word in words)
+    product_code = product_group[:2].upper()
+    first_two = words[0][:2]
+    first_three = words[0][:3]
+    first_four = words[0][:4]
+    last_two = words[0][-2:]
+    last_char = words[0][-1]
+    potential_initials = [
+        first_two + product_code,
+        first_two + last_two,
+        initials + last_char + product_code,
+        first_four,
+    ][:15]  # Limit to 15 potential initials
+
+    all_initials = "LIC-C-" + "-A, LIC-C-".join(potential_initials) + "-A"
+    print(all_initials)
+
+    return all_initials
+
+def handle_two_words(words, product_group, existing_codes):
+    first_two = words[0][:2]
+    first_four = words[0][:4]
+    product_code = product_group[:2].upper()
+    initials = ''.join(word[0].upper() for word in words)
+    last_two = words[1][-2:]
+    random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, len(words[0])})
+    potential_initials = (
+        [
+            first_two + product_code,
+            first_four,
+            initials[0] + initials[1] + last_two,
+            initials[0] + initials[1] + product_code
+        ] + [initials[0] + initials[1] + comb for comb in random_combinations]
+    )[:15]  # Limit to 15 potential initials
+
+    all_initials = "LIC-C-" + "-A, LIC-C-".join(potential_initials) + "-A"
+    print(all_initials)
+
+    return all_initials
+
+def handle_three_words(words, product_group, existing_codes):
+    initials = ''.join(word[0].upper() for word in words)
+    first_four = ''.join(word[0].upper() for word in words[:4])
+    product_code = product_group[:2].upper()
+    last_two = words[-1][-2:]
+    last_char = words[-1][-1]
+    random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, 2})
+    potential_initials = (
+        [
+            initials + last_char,
+            first_four,
+            initials[0] + initials[1] + last_two,
+            initials[0] + initials[1] + product_code
+        ] + [initials[0] + initials[1] + comb for comb in random_combinations]
+    )[:15]  # Limit to 15 potential initials
+
+    all_initials = "LIC-C-" + "-A, LIC-C-".join(potential_initials) + "-A"
+    print(all_initials)
+
+    return all_initials
+
+def handle_four_or_more_words(words, product_group, existing_codes):
+    initials = ''.join(word[0].upper() for word in words)
+    first_three = ''.join(word[0].upper() for word in words[:3])
+    first_four = ''.join(word[0].upper() for word in words[:4])
+    product_code = product_group[:2].upper()
+    last_two = words[-1][-2:]
+    last_char = words[-1][-1]
+    random_combinations = get_all_random_combinations(''.join(words), 2, {0, 1, 2})
+    potential_initials = (
+        [
+            first_four,
+            initials[0] + initials[1] + initials[2] + initials[3],
+            initials[0] + initials[1] + last_two,
+            initials[0] + initials[1] + product_code
+        ] + [initials[0] + initials[1] + comb for comb in random_combinations]
+    )[:15]  # Limit to 15 potential initials
+
+    all_initials = "LIC-C-" + "-A, LIC-C-".join(potential_initials) + "-A"
+    print(all_initials)
+
+    return all_initials
+
+def get_initials(string, existing_codes, product_group):
+    words = re.findall(r"[\w']+", string.upper())
+    words = [word for word in words if word not in ['FOR', 'TO', 'AND', 'WITH', 'BY']]
+
+    if len(words) == 1:
+        initials = handle_one_word(words, product_group, existing_codes)
+    elif len(words) == 2:
+        initials = handle_two_words(words, product_group, existing_codes)
+    elif len(words) == 3:
+        initials = handle_three_words(words, product_group, existing_codes)
+    else:
+        initials = handle_four_or_more_words(words, product_group, existing_codes)
+    
+    if initials and not is_duplicate(initials, existing_codes):
+        existing_codes.add(initials)
+        print(f"Addon: {words} with item code: {initials}")
+        return initials.upper()
+    else:
+        print(f"Could not generate unique initials for: {words}")
+        return None
+
+# Marketplace Addon Fetching and Processing
 class MarketplaceAddonFetcher:
     def __init__(self):
         self.jira_service = JiraService()
@@ -39,7 +157,7 @@ class MarketplaceAddonFetcher:
                 "Summary": addon.get("summary"),
                 "Tag Line": addon.get("tagLine"),
                 "Product Group": application,
-                "Item Code": f"LIC-C-{product_code}-A",
+                "Item Code": product_code,  # Directly using the formatted string from get_initials
                 "Categories": [cat.get("name") for cat in addon["_embedded"]["categories"]]
             })
         return parsed_addons
@@ -74,7 +192,6 @@ class MarketplaceAddonFetcher:
         write_json_to_file(output_file, all_addons)
         print(f"Saved {total_count} addons to {output_file}")
 
-        # Save failed addons to a new file
         write_json_to_file(failed_output_file, self.failed_addons)
         print(f"Saved {len(self.failed_addons)} failed addons to {failed_output_file}")
 

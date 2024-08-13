@@ -36,7 +36,7 @@ def handle_one_word(words, product_group, existing_codes):
 
 def handle_two_words(words, product_group, existing_codes):
     first_two = words[0][:2]
-    first_four = ''.join(word[0].upper() for word in words[:4])
+    first_four = words[0][:4]
     product_code = product_group[:2].upper()
     initials = ''.join(word[0].upper() for word in words)
     last_two = words[1][-2:]
