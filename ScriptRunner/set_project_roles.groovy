@@ -214,8 +214,8 @@ actionProjectRoleMapping = [//market-end feedback
                             //pictures shot planning
                             1841:['currentPRs':['Graphic Designer 3'],'nextPRs':['Graphic Designer 3'],'nextPRs_skip':['Project Lead']],
                             1851:['currentPRs':['Graphic Designer 3'],'nextPRs':['Graphic Designer 3']],
-                            1861:['currentPRs':['Graphic Designer 3'],'nextPRs':['Marketing Manager']],
-                            1871:['currentPRs':['Product Manager'],'approvePRs':['Product Manager'],'declinePRs':['Graphic Designer 3']],
+                            1861:['currentPRs':['Graphic Designer 3'],'nextPRs':['Product Manager']],//not used
+                            1871:['currentPRs':['Product Manager'],'approvePRs':['Graphic Designer 3'],'declinePRs':['Graphic Designer 3']],
                             1891:['currentPRs':['Graphic Designer 3'],'nextPRs':['Project Lead']],
                             2271:['currentPRs':['Project Lead'],'approvePRs_condition':['Project Lead'],'declinePRs':['Graphic Designer 3']],
                             // Pre-Launch Stage Wrap-Up
@@ -794,6 +794,11 @@ def validateChecklist(customField) {
 
     if (customField.getId().contains("11821") && actionId == 991) {
         log.warn "EDGE CASEs : Pilot-run sample review"
+        return true
+    }
+
+    if (customField.getId().contains("11202") && actionId == 1861) {
+        log.warn "EDGE CASEs : Picture Shots Planning Task Review"
         return true
     }
     

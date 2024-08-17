@@ -17,7 +17,7 @@ def currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUs
 if ( !isUserMemberOfRole('Administrators')) {
 def roleToCheck = "Product Manager"
 if (!isUserMemberOfRole(roleToCheck)) {			
-    invalidInputException = new InvalidInputException(String.format("Only %s can execute this transtion", roleToCheck))
+    invalidInputException = new InvalidInputException(String.format("Only %s can execute this transition", roleToCheck))
 }
 }
 
