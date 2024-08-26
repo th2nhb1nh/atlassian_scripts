@@ -554,7 +554,8 @@ def issueEventMappings = [
         "Photographer":10109,
         "Tech Support":10104,
         "Instruction Writer":10107,
-        "Marketing Manager":10106
+        "Marketing Manager":10106,
+        "Product Manager":10102
 ]
 
 
