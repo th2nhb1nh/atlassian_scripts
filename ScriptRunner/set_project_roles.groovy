@@ -90,6 +90,7 @@ actionScreenMapping = [51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //ma
 3491:13501, 3601:0, 3611:0, 3621:0, 3631:0, 3641:11204, //G-Shopping Review
 3651:13500, 3681:0, 3691:0, 3701:0, 3711:0, 3721:11204, //Web Meta Desc
 3661:13502, 3731:13504, 3741:13503, 3751:11205, 3761:13505, 3771:11204, //eBlast Post
+4001:13502, 4011:13504, 4021:11205, 4041:11204, // Product Announcement
 3671:13202, 3781:13401, 3791:13400, 3801:13402, 3811:0, 3821:11204, //AMZ A+ Content
 3841:13600, 3851:11205, 3861:11204, //Merchandising Stage Wrap-Up
 ]
@@ -362,13 +363,18 @@ actionProjectRoleMapping = [//market-end feedback
                             3801:['currentPRs':['Graphic Designer 3'],'approvePRs':['Merchandiser'],'declinePRs':['Graphic Designer 1']],
                             3811:['currentPRs':['Merchandiser'],'nextPRs':['Project Lead']],//not used
                             3821:['currentPRs':['Merchandiser'],'approvePRs_condition':['Merchandiser'],'declinePRs':['Graphic Designer 1']],
-                            //eblast post
+                            //eblast post -> rename to Product Announcement
                             3661:['currentPRs':['Merchandiser'],'nextPRs':['Graphic Designer 1'],'nextPRs_skip':['Merchandiser']], 
                             3731:['currentPRs':['Graphic Designer 1'],'nextPRs':['Graphic Designer 1']],
                             3741:['currentPRs':['Graphic Designer 1'],'nextPRs':['Graphic Designer 3']],
                             3751:['currentPRs':['Graphic Designer 3'],'approvePRs':['Graphic Designer 3'],'declinePRs':['Graphic Designer 1']],
                             3761:['currentPRs':['Graphic Designer 3'],'nextPRs':['Merchandiser']],
                             3771:['currentPRs':['Merchandiser'],'approvePRs_condition':['Merchandiser'],'declinePRs':['Graphic Designer 3']],
+                            //Product Announcement
+                            4001:['currentPRs':['Merchandiser'],'nextPRs':['Graphic Designer 1'],'nextPRs_skip':['Product Manager']], 
+                            4011:['currentPRs':['Graphic Designer 1'],'nextPRs':['Merchandiser']],
+                            4021:['currentPRs':['Merchandiser'],'approvePRs':['Product Manager'],'declinePRs':['Graphic Designer 1']],
+                            4041:['currentPRs':['Product Manager'],'approvePRs_condition':['Product Manager'],'declinePRs':['Merchandiser']],
                             //Merchandising Stage Wrap-Up
                             3841:['currentPRs':['Merchandiser'],'nextPRs':['Project Lead']],
                             3851:['currentPRs':['Project Lead'],'approvePRs':['Project Lead'],'declinePRs':['Merchandiser']],
@@ -403,7 +409,8 @@ debugActionProjectRoleMapping = [2451:['Tech Support','Copywriter','Graphic Desi
                                  3871:['Merchandiser', 'Merchandiser', 'Buyer'],
                                  3881:['Merchandiser', 'Merchandiser', 'Merchandiser'],
                                  3891:['Project Lead', 'Merchandiser', 'Merchandiser'],
-                                 3901:['Merchandiser', 'Merchandiser']]
+                                 3901:['Merchandiser', 'Merchandiser'],
+                                 4051:['Merchandiser']]
 
 //store Prototype Decline Stage
 prototypeDeclineStage = ''
@@ -726,10 +733,16 @@ def validateSelectList(customField) {
         }
 
         //merchandising stage milestone 3
-        if (actionId == 3721 || actionId == 3771 || actionId == 3821) {
+        // if (actionId == 3721 || actionId == 3771 || actionId == 3821) {
+        //     def environment = Eval.me(issue.environment)
+        //     //conditionPassed = environment.stages."Web Meta Desc" == "Closed" && environment.stages."eBlast Post" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
+        //     conditionPassed = environment.stages."eBlast Post" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
+        // }
+
+        if (actionId == 3721 || actionId == 3771 || actionId == 3821 || actionId == 4041) {
             def environment = Eval.me(issue.environment)
             //conditionPassed = environment.stages."Web Meta Desc" == "Closed" && environment.stages."eBlast Post" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
-            conditionPassed = environment.stages."eBlast Post" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
+            conditionPassed = environment.stages."Product Announcement" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
         }
 
         return selectListItem == "Close"
@@ -803,9 +816,14 @@ def validateChecklist(customField) {
         return true
     }
     
-    if ((customField.getId().contains("14702") && actionId == 3661)) {
-        log.warn "LAUNCH EBLAST POST"
-        return checklistActionItems != null
+    // if ((customField.getId().contains("14702") && actionId == 3661)) {
+    //     log.warn "LAUNCH EBLAST POST"
+    //     return checklistActionItems != null
+    // }
+    
+    if ((customField.getId().contains("14702") && actionId == 4001) || (customField.getId().contains("14702") && actionId == 4011)) {
+        log.warn "EDGE CASEs : PRODUCT ANNOUNCEMENT"
+        return true
     }
 
     if ((customField.getId().contains("14600") && actionId == 3671)) {
