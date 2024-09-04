@@ -38,6 +38,7 @@ class MarketplaceAddonFetcher:
             if not product_code:
                 self.failed_addons.append({
                     "Name": addon.get("name"),
+                    "Add-on Key": addon.get("key"),
                     "Id": addon.get("id"),
                     "Link": f"{self.jira_service.marketplace_url}{addon['_links']['alternate']['href']}",
                     "Summary": addon.get("summary"),
@@ -48,6 +49,7 @@ class MarketplaceAddonFetcher:
                 continue
             parsed_addons.append({
                 "Name": addon.get("name"),
+                "Add-on Key": addon.get("key"),
                 "Id": addon.get("id"),
                 "Link": f"{self.jira_service.marketplace_url}{addon['_links']['alternate']['href']}",
                 "Summary": addon.get("summary"),
