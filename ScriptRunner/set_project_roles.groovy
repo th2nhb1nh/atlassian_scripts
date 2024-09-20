@@ -392,7 +392,7 @@ debugActionProjectRoleMapping = [2451:['Tech Support','Copywriter','Graphic Desi
                                  2851:['Buyer'],
                                  2861:['Buyer'],
                                  2871:['Buyer'],
-                                 2881:['Buyer','Project Lead'],
+                                 2881:['Buyer','Project Lead'], // debug to Pilot-Run External Communication
                                  2891:['Buyer'],
                                  2901:['Merchandiser','Buyer'],
                                  3141:['Buyer'],

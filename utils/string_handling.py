@@ -10,6 +10,10 @@ def encode_base64(string):
 def is_duplicate(initials, existing_codes):
     return initials in existing_codes
 
+def clean_string(string):
+    cleaned = re.sub(r'[^a-zA-Z0-9]', ' ', string)
+    return cleaned.upper()
+
 def get_all_random_combinations(string, count, exclude_indices):
     available_chars = [string[i] for i in range(len(string)) if i not in exclude_indices]
     return [''.join(comb) for comb in itertools.combinations(available_chars, count)]
@@ -95,7 +99,8 @@ def handle_four_or_more_words(words, product_group, existing_codes):
     return None
 
 def get_initials(string, existing_codes, product_group):
-    words = re.findall(r"[\w']+", string.upper())
+    cleaned_string = clean_string(string)
+    words = cleaned_string.split()
     words = [word for word in words if word not in ['FOR', 'TO', 'AND', 'WITH', 'BY']]
 
     if len(words) == 1:
