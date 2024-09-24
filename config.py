@@ -10,9 +10,11 @@ class JiraConfig:
     MARKETPLACE_URL = os.getenv("MARKETPLACE_URL")
     EMAIL = os.getenv("EMAIL")
     API_KEY = os.getenv("API_KEY")
+    COOKIE = os.getenv("JIRA_COOKIE")
     TOKEN = encode_base64(f"{EMAIL}:{API_KEY}")
     HEADERS = {
-        "Authorization": f"Basic {TOKEN}",
+        # "Authorization": f"Basic {TOKEN}",
+        "Cookie": COOKIE,
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
