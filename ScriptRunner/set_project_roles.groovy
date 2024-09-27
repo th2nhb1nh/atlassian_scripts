@@ -58,7 +58,7 @@ actionScreenMapping = [51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //ma
 3121:10507, 2911:10700, 2931:10702, 2921:10705, 2951:11205, 2961:11202, 2941:11204, //Product Prototype Internal Communication
 3111:10508, 3011:10701, 2981:10703, 3001:10704, 2991:12000, 2971:10800, 3021:11204, //Prototype External Communication
 3101:10501, 3061:10801, 3041:11400, 3031:11203, 3051:11204, //prototype evaluation
-3091:10505, 3081:11400, 3071:11204, //Prototype Stage Wrap-Up
+3091:10505, 3081:11400, 3071:11204, //Prototype Stage Wrap-Up (replace Product Prototype Internal Communication + Prototype External Communication + prototype evaluation)
 591:10511, 601:10802, 611:10803, 621:11205, 1441:10804, 2191:12900, //SKU-UP Initiation
 1491:10512, 1521:10806, 1531:10807, 1541:11205, 1561:10808, 2201:11204, //product specs
 1501:10513, 1621:10809, 1631:10810, 1641:11205, 1661:10811, 2211:11204, //mrd
@@ -80,10 +80,10 @@ actionScreenMapping = [51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //ma
 2541:11904, 2551:11905, 2561:11906, 2571:11205, 2581:11907, 2591:11204, //Additional Sketching
 2601:11908, 2611:11909, 2621:11910, 2631:11205, 2641:11911, 2651:11204, //Outdoor Shot Shooting
 2661:11912, 2681:11913, 2691:11914, 2701:11205, 2711:11915, 2721:11204, //Image Post-Editing
-2731:11916, 2781:11204, // listing feed creation
+2731:11916, 2741:11917, 2761:11205, 2781:11204, // listing feed creation
 2791:11920, 2801:11205, 2811:11204, //Digital Creation Stage Wrap-Up
-3281:13100, 3291:13300, 3301:13301, 3311:13302, 3321:0, 3331:11204, //AMZ brand page
-3341:13101, 3361:0, 3371:0, 3381:11205, 3391:0, 3401:11204, //eMail Notifications
+3281:13202, 3291:13401, 3301:13400, 3311:13402, 3321:0, 3331:11204, //AMZ A+ Content
+3341:13900, 3361:13901, 3371:13902, 3381:13903, 3391:0, 3401:11204, //eMail Notifications aka Product Page Optimization
 3411:13102, 3421:13103, 3431:0, 3441:11205, 3451:0, 3461:11204, //Test Bench Samples
 3471:13200, 3501:0, 3511:0, 3521:11205, 3531:0, 3541:11204, //AMZ ads
 3481:13201, 3551:0, 3561:0, 3571:11205, 3581:0, 3591:11204, //eBay ads
@@ -301,8 +301,10 @@ actionProjectRoleMapping = [//market-end feedback
                             2711:['currentPRs':['Graphic Designer 3'],'nextPRs':['Marketing Manager']],
                             2721:['currentPRs':['Marketing Manager'],'approvePRs':['Marketing Manager'],'declinePRs':['Graphic Designer 3']],
                             // listing feed creation
-                            2731:['currentPRs':['Marketing Manager'],'nextPRs':['Project Lead']],
-                            2781:['currentPRs':['Project Lead'],'approvePRs':['Merchandiser'],'declinePRs':['Marketing Manager']],
+                            2731:['currentPRs':['Merchandiser'],'nextPRs':['Merchandiser']],
+                            2741:['currentPRs':['Merchandiser'],'nextPRs':['Product Manager']],
+                            2761:['currentPRs':['Product Manager'],'approvePRs':['Marketing Manager'],'declinePRs':['Merchandiser']],
+                            2781:['currentPRs':['Marketing Manager'],'approvePRs':['Merchandiser'],'declinePRs':['Merchandiser']],//not used
                             //Digital Creation Stage Wrap-Up
                             2791:['currentPRs':['Merchandiser'],'nextPRs':['Project Lead']],
                             2801:['currentPRs':['Project Lead'],'approvePRs':['Project Lead'],'declinePRs':['Merchandiser']],
@@ -383,34 +385,37 @@ actionProjectRoleMapping = [//market-end feedback
 
 
 /* DEBUG ONLY */
-debugActionProjectRoleMapping = [2451:['Tech Support','Copywriter','Graphic Designer 1'],
-                                 2461:['Merchandiser'],
-                                 2471:['Buyer','Project Lead','Graphic Designer 2'],
-                                 2821:['Buyer'],
-                                 2831:['Buyer'],
-                                 2841:['Buyer'],
-                                 2851:['Buyer'],
-                                 2861:['Buyer'],
-                                 2871:['Buyer'],
-                                 2881:['Buyer','Project Lead'], // debug to Pilot-Run External Communication
-                                 2891:['Buyer'],
-                                 2901:['Merchandiser','Buyer'],
-                                 3141:['Buyer'],
-                                 3151:['Buyer'],
-                                 3161:['Merchandiser'],
-                                 3171:['Graphic Designer 1', 'Photographer', 'Photographer'],
-                                 3181:['Graphic Designer 1', 'Photographer', 'Photographer'],
-                                 3191:['Graphic Designer 1', 'Photographer', 'Photographer'],
-                                 3201:['Graphic Designer 3'],
-                                 3211:['Marketing Manager'],
-                                 3221:['Merchandiser'],
-                                 3261:['Project Lead'],
-                                 3131:['Project Lead'],
-                                 3871:['Merchandiser', 'Merchandiser', 'Buyer'],
-                                 3881:['Merchandiser', 'Merchandiser', 'Merchandiser'],
-                                 3891:['Project Lead', 'Merchandiser', 'Merchandiser'],
-                                 3901:['Merchandiser', 'Merchandiser'],
-                                 4051:['Merchandiser']]
+debugActionProjectRoleMapping = [
+                                    2451:['Tech Support','Copywriter','Graphic Designer 1'],// product copy
+                                    2461:['Merchandiser'],//Market-end Feedback
+                                    2471:['Buyer','Product Manager','Graphic Designer 1'],//MRD
+                                    2821:['Buyer'],//Initial PO Stage Wrap-Up
+                                    2831:['Buyer'],//PO Release
+                                    2841:['Buyer'],//Initial PO Budget
+                                    2851:['Buyer'],//Pilot-Run Stage Wrap-up
+                                    2861:['Buyer'],//QC Test Procedure
+                                    2871:['Buyer'],//Pilot-Run Sample Review
+                                    2881:['Buyer'],//Pilot-Run External Communication
+                                    2891:['Buyer'],//PRD
+                                    2901:['Merchandiser','Buyer'],//Pre-Launch Stage Wrap-Up
+                                    3141:['Buyer'],//Prototype External Communication
+                                    3151:['Buyer'],//Product Prototype Evaluation
+                                    3161:['Merchandiser'],//Prototype Stage Wrap-Up
+                                    3171:['Graphic Designer 1', 'Photographer', 'Photographer'],//Additional Sketching
+                                    3181:['Graphic Designer 1', 'Photographer', 'Photographer'],//Outdoor Shot Shooting
+                                    3191:['Graphic Designer 1', 'Photographer', 'Photographer'],//Studio Shot Shooting
+                                    3201:['Graphic Designer 3'],//Image Post-Editing
+                                    3211:['Merchandiser'],//Listing Feed Creation
+                                    3221:['Merchandiser'],//Digital Creation Stage Wrap-Up
+                                    3261:['Product Manager'],//SKU-UP Initiation
+                                    3131:['Product Manager'],//Product Prototype Internal Communication
+                                    3911:['Merchandiser', 'Merchandiser', 'Buyer'],//AMZ A+ Content
+                                    3871:['Merchandiser', 'Merchandiser', 'Buyer'],//AMZ Brand Page
+                                    3881:['Merchandiser', 'Merchandiser', 'Merchandiser'],//Google Shopping Ads
+                                    3891:['Product Manager', 'Merchandiser', 'Merchandiser'],//Web Meta Desc
+                                    3901:['Merchandiser', 'Merchandiser'],//eBlast Post
+                                    4051:['Merchandiser', 'Merchandiser']//Product Announcement
+                                ]
 
 //store Prototype Decline Stage
 prototypeDeclineStage = ''
@@ -432,13 +437,13 @@ def actionName = wfd.getAction(actionId).getName()
 log.warn "Action name " + actionName
 
 stagesMapping = [
-        "Initiation Stage" : ['Market-end Feedback', 'Factory-end Sourcing', 'Competitor Sample Purchase', 'Factory Sample Purchase','Market-end Feedback vs. Factory-end Sourcing Evaluation', 'Initiation Stage Wrap-up'],
-        "Prototype Stage" : ['Prototype Internal Communication', 'Prototype External Communication', 'Product Prototype Evaluation','Prototype Stage Wrap-up'],
-        "Pre-launch Stage" : ['SKU-UP Initiation', 'Product Specs', 'MRD', 'Label Artworks', 'Product Instruction Manual','Picture Shots Planning', 'Product Packaging Design', 'Product Copy', 'Product Patent', 'Pre-Launch Stage Wrap-up'],
-        "Pilot-run Stage" : ['PRD','Pilot-Run External Communication','Pilot-Run Sample Review','QC Test Procedure','Pilot-Run Stage Wrap-up'],
-        "Initial PO Stage" : ['Initial PO Budget','PO Release','Initial PO Stage Wrap-Up'],
-        "Digital Creation Stage" : ['Additional Sketching', 'Studio Shot Shooting', 'Outdoor Shot Shooting', 'Image Post-Editing', 'Listing Feed Creation', 'Digital Creation Stage Wrap-Up']
-        //need to add Merchandising Stage
+        "Initiation Stage" : ['Market Feedback', 'Factory Sourcing', 'M-Sample Purchase', 'F-Sample Purchase','M vs. F Eval', 'Initiation Wrap-Up', 'Initiation Stage Wrap-up'],
+        "Prototype Stage" : ['P-TYPE Int. Meet', 'P-TYPE Ext. Meet', 'P-TYPE Eval','P-TYPE Wrap-Up', 'Prototype Stage Wrap-up'],
+        "Pre-launch Stage" : ['SKU Initiation', 'Product Spec', 'MRD', 'Label Artwork', 'Manual Creation','Picture Shot Plan', 'Package Creation', 'Copy Creation', 'Pre-Launch Wrap-Up'],
+        "Pilot-run Stage" : ['PRD','P-Run Ext. Meet','P-Run Sample Review','Test Procedure','Pilot-Run Wrap-up'],
+        "Initial PO Stage" : ['Initial PO Budget','PO Release','Initial PO Wrap-Up'],
+        "Digital Creation Stage" : ['Sketching', 'Studio Shot', 'Outdoor Shot', 'Post Editing', 'Feed Creation', 'Digital Wrap-Up'],
+        "Merchandising Stage": ['AMZ Brand Page', 'Page Optimization', 'Test Bench', 'AMZ Ads', 'eBay Ads', 'AMZ A+ Content', 'Merchandising Wrap-up']
 ]
 
 def prefixKeywords = ["Information Gathering", "Information Analysis", "Closed", "Documentation", "Approval Review", "Meeting Follow-up", "Actual Meeting", "Meeting Arrangement", "Check List Verification", "Task Processing", "Task Review"]
@@ -481,15 +486,19 @@ if (screenId == null && (debugActionProjectRoleMapping.keySet().contains(actionI
 
     if (isApprovalAction(screenId)) {
         log.warn "Approval action"
-        rolesToRemove += getPRsFromMapping(actionId, 'currentPRs')
+        def isApproved = validateCustomFields(customFields.find{ it.getName().contains("Approval Option") })
         if (isValidFields) {
+            rolesToRemove += getPRsFromMapping(actionId, 'currentPRs')
             rolesToAdd += getPRsFromMapping(actionId, conditionPassed ? 'approvePRs_condition' : 'approvePRs')
         } else {
-            def key = 'declinePRs'
-            if (prototypeDeclineStage) {
-                key += '_' + prototypeDeclineStage
+            if (isApproved == false) {
+                rolesToRemove += getPRsFromMapping(actionId, 'currentPRs')
+                def key = 'declinePRs'
+                if (prototypeDeclineStage) {
+                    key += '_' + prototypeDeclineStage
+                }
+                rolesToAdd += getPRsFromMapping(actionId, key)
             }
-            rolesToAdd += getPRsFromMapping(actionId, key)
         }
     } else if (isCloseAction(screenId)) {
         log.warn "Close action"
@@ -551,7 +560,7 @@ issue.environment = environment.inspect()
 
 /* SEND EMAILS */
 def issueEventMappings = [
-        "Project Lead":10102,
+        "Product Manager":10102,
         "Merchandiser":10101,
         "Buyer":10100,
         "Copywriter": 10103,
@@ -562,7 +571,7 @@ def issueEventMappings = [
         "Tech Support":10104,
         "Instruction Writer":10107,
         "Marketing Manager":10106,
-        "Product Manager":10102
+        "Project Participant":10106
 ]
 
 
@@ -599,7 +608,7 @@ def getPRsFromMapping(actionId,key) {
 }
 
 def isApprovalAction(screenId) {
-    def approvalScreenIds = [11205,11700,11400,11600,12000,12700,13302,13402,13704,13706]
+    def approvalScreenIds = [11205,11700,11400,11600,12000,12700,13302,13402,13704,13706,13903]
     return approvalScreenIds.contains(screenId)
 }
 
@@ -625,6 +634,9 @@ def getCustomFieldsOnScreen(screenId) {
 }
 
 def validateCustomFields(customField) {
+    if (customField == null) {
+        return false
+    }
     //CustomField 'Manual Creation Information Gathering SKIP'
     if (customField.getId().contains("15110")) {
         String skipValue = issue.getCustomFieldValue(customField)
@@ -714,16 +726,23 @@ def validateSelectList(customField) {
             conditionPassed = environment.stages."Studio Shot Shooting" != "Closed" && environment.stages."Additional Sketching" != "Closed" && environment.stages."Outdoor Shot Shooting" == "Closed"
         }
 
+        //Pilot-Run Stage Wrap-up
+        if (actionId == 2331) {
+            def environment = Eval.me(issue.environment)
+            conditionPassed = environment.stages."Picture Shots Planning" == "Closed"
+        }
+
         //pictures shot planning
         if (actionId == 2271) {
             def environment = Eval.me(issue.environment)
-            conditionPassed = environment.stages."Pilot-Run Stage Wrap-up" == "Approval Review"
+            conditionPassed = environment.stages."Pilot-Run Stage Wrap-up" == "Closed"
+            // conditionPassed = environment.stages."Pilot-Run Stage Wrap-up" == "Approval Review"
         }
 
         //merchandising stage milestone 1
         if (actionId == 3331 || actionId == 3401 || actionId == 3461) {
             def environment = Eval.me(issue.environment)
-            conditionPassed = environment.stages."AMZ Brand Page" == "Closed" && environment.stages."eMail Notifications" == "Closed" && environment.stages."Test Bench Samples" == "Closed"
+            conditionPassed = environment.stages."AMZ A+ Content" == "Closed" && environment.stages."Product Page Optimization" == "Closed" && environment.stages."Test Bench Samples" == "Closed"
         }
 
         //merchandising stage milestone 2
@@ -742,7 +761,7 @@ def validateSelectList(customField) {
         if (actionId == 3721 || actionId == 3771 || actionId == 3821 || actionId == 4041) {
             def environment = Eval.me(issue.environment)
             //conditionPassed = environment.stages."Web Meta Desc" == "Closed" && environment.stages."eBlast Post" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
-            conditionPassed = environment.stages."Product Announcement" == "Closed" && environment.stages."AMZ A+ Content" == "Closed"
+            conditionPassed = environment.stages."Product Announcement" == "Closed" && environment.stages."AMZ Brand Page" == "Closed"
         }
 
         return selectListItem == "Close"
@@ -759,17 +778,13 @@ def validateSelectList(customField) {
             }
         }
 
-        //pilot-run stage wrap-up approval review
-        if (actionId == 1061) {
-            def environment = Eval.me(issue.environment)
-            conditionPassed = environment.stages."Picture Shots Planning" == "Closed"
-        }
-
         return !selectListItem.contains("Decline")
     }
 
     def defaultOptions = []
-    ComponentAccessor.getOptionsManager().getOptions(customField.getConfigurationSchemes().listIterator().next().getOneAndOnlyConfig()).each { defaultOptions.add(it.toString()) }
+    ComponentAccessor.getOptionsManager().getOptions(customField.getConfigurationSchemes().listIterator().next().getOneAndOnlyConfig()).each { 
+        if (it.getDisabled() == false) { defaultOptions.add(it.toString()) }
+    }
     for (option in defaultOptions) {
         log.warn "Option " + option
     }
@@ -786,7 +801,9 @@ def validateCheckboxes(customField) {
     }
 
     def defaultOptions = []
-    ComponentAccessor.getOptionsManager().getOptions(customField.getConfigurationSchemes().listIterator().next().getOneAndOnlyConfig()).each { defaultOptions.add(it.toString()) }
+    ComponentAccessor.getOptionsManager().getOptions(customField.getConfigurationSchemes().listIterator().next().getOneAndOnlyConfig()).each { 
+        if (it.getDisabled() == false) { defaultOptions.add(it.toString()) }
+    }
     for (option in defaultOptions) {
         log.warn "Option " + option
     }
@@ -826,12 +843,12 @@ def validateChecklist(customField) {
         return true
     }
 
-    if ((customField.getId().contains("14600") && actionId == 3671)) {
+    if ((customField.getId().contains("14600") && actionId == 3281)) {
         log.warn "AMZ A+ CONTENT"
         return checklistActionItems != null
     }
 
-    if ((customField.getId().contains("14500") && actionId == 3281)) {
+    if ((customField.getId().contains("14500") && actionId == 3671)) {
         log.warn "AMZ BRAND PAGE"
         return checklistActionItems != null
     }
@@ -840,6 +857,15 @@ def validateChecklist(customField) {
         log.warn "Communication EDGE CASEs"
         return checklistActionItems != null
     }
+
+    // Product copy processing edge case
+    // If checklist doesn't have items, then skip validating
+    // If checklist has items, then proceed to validate
+    if (customField.getId().contains("11104") && actionId == 1751 && checklistActionItems == null) {
+        log.warn "Copy creation EDGE CASEs"
+        return true
+    }
+
     log.warn "IS READY " + isReady(checklistActionItems)
     if ( isReady(checklistActionItems) == "Fully-Ready" ) {
         return true
