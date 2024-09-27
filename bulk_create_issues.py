@@ -11,7 +11,7 @@ class JiraIssueCreator:
         self.base_url = os.getenv('JIRA_URL')
         self.email = os.getenv('EMAIL')
         self.api_token = os.getenv('API_KEY')
-        self.project_key = "BTP"
+        self.project_key = "BTOI"
         self.issue_type = "Task"
 
     def create_issue(self, summary, description):
@@ -62,6 +62,7 @@ class JiraIssueCreator:
         for issue in issues_data:
             result = self.create_issue(issue["summary"], issue["description"])
             print(f"Created issue: {result.get('key', 'Error')}")
+            print(result)
 
 # Sample data for 10 issues
 issues_data = [
