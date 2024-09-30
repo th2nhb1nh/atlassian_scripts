@@ -48,7 +48,8 @@ log.setLevel(Level.DEBUG)
 //[actionId:screenId]
 /* Mapping of transition and its corresponding screens */
 /* Please update if the workflow changed */
-actionScreenMapping = [51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //market-end feedback
+actionScreenMapping = [
+51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //market-end feedback
 61:10537, 81: 10436, 411:11205, 421:11200, 2091:11204, //factory-end sourcing
 1161:10602, 1181:11205, 1201:10600, 1221:10438, 2111:11204, //Competitor Sample Purchase
 1171:10440, 1191:11205, 1211:10601, 1231:10603, 2121:11204, //Factory Sample Purchase
@@ -90,8 +91,8 @@ actionScreenMapping = [51:10424, 71:10536, 91:11205, 101:10548, 2081:11204, //ma
 3491:13501, 3601:0, 3611:0, 3621:0, 3631:0, 3641:11204, //G-Shopping Review
 3651:13500, 3681:0, 3691:0, 3701:0, 3711:0, 3721:11204, //Web Meta Desc
 3661:13502, 3731:13504, 3741:13503, 3751:11205, 3761:13505, 3771:11204, //eBlast Post
-4001:13502, 4011:13504, 4021:11205, 4041:11204, // Product Announcement
-3671:13202, 3781:13401, 3791:13400, 3801:13402, 3811:0, 3821:11204, //AMZ A+ Content
+4001:13502, 4011:13504, 4021:11205, 4041:11204, // Product Announcement (replace eBlast Post)
+3671:13100, 3781:13300, 3791:13301, 3801:13302, 3811:0, 3821:11204, //AMZ brand page
 3841:13600, 3851:11205, 3861:11204, //Merchandising Stage Wrap-Up
 ]
 
