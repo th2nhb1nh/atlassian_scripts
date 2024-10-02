@@ -1,4 +1,4 @@
-# marketplace_get_all_addons.py
+# marketplace_get_all_addons_prod.py
 import csv
 import re
 from collections import defaultdict
@@ -13,12 +13,13 @@ class MarketplaceAddonFetcher:
         self.existing_addon_keys = set()
         self.failed_addons = []
         self.duplicate_addons = []
+        self.parsed_addons_dict = {}
 
     def load_existing_data(self, csv_file):
         existing_addons = read_csv(csv_file)
         self.existing_codes = {addon['Item Code'] for addon in existing_addons}
         self.existing_addon_keys = {addon['Addon Key'] for addon in existing_addons}
-        print(f"[INFO] Loaded {len(self.existing_codes)} existing codes and {len(self.existing_addon_keys)} existing addon keys from {csv_file}")
+        print(f"[INFO] Loaded {len(self.existing_codes)} existing codes and {len(self.existing_addon_keys)} existing addon keys")
 
     def fetch_addons(self, application):
         addons = []
@@ -48,7 +49,6 @@ class MarketplaceAddonFetcher:
         return truncated + "..."
 
     def parse_addon_details(self, addons, application):
-        parsed_addons = []
         sorted_addons = sorted(addons, key=lambda x: len(x.get("name", "")))
         
         for addon in sorted_addons:
@@ -67,29 +67,30 @@ class MarketplaceAddonFetcher:
                 self.duplicate_addons.append(parsed_addon)
                 continue
 
+            if addon_key in self.parsed_addons_dict:
+                # Update existing entry with new application
+                self.parsed_addons_dict[addon_key]["Product Group"] += f", {application}"
+                continue
+
             product_code = self.handle_addon_code(addon.get("name", ""), application)
             if not product_code:
                 self.failed_addons.append(parsed_addon)
                 continue
             
             parsed_addon["Item Code"] = f"LIC-C-{product_code}-A"
-            parsed_addons.append(parsed_addon)
-
-        return parsed_addons
+            self.parsed_addons_dict[addon_key] = parsed_addon
 
     def save_addons_to_csv(self, file_prefix, csv_file):
         applications = ["jira", "confluence", "bitbucket", "compass"]
-        all_addons = []
 
         self.load_existing_data(csv_file)
 
         for application in applications:
             addons = self.fetch_addons(application)
-            parsed_addons = self.parse_addon_details(addons, application)
-            all_addons.extend(parsed_addons)
-            app_count = len(parsed_addons)
-            print(f"[INFO] Total fetched addons for {application}: {app_count}\n")
+            self.parse_addon_details(addons, application)
+            print(f"[INFO] Total fetched addons for {application}: {len(addons)}\n")
 
+        all_addons = list(self.parsed_addons_dict.values())
         total_count = len(all_addons)
         print(f"[SUCCESS] All {total_count} addons have been fetched and will be saved in a CSV file.")
 
@@ -97,21 +98,14 @@ class MarketplaceAddonFetcher:
 
         output_file = f"{file_prefix}.csv"
         write_csv_to_file(output_file, all_addons, fieldnames)
-        print(f"[SUCCESS] Saved {total_count} addons to {output_file}")
 
         if self.failed_addons:
             failed_output_file = "data/failed_addons.csv"
             write_csv_to_file(failed_output_file, self.failed_addons, fieldnames)
-            print(f"[WARNING] Saved {len(self.failed_addons)} failed addons to {failed_output_file}")
-        else:
-            print("[INFO] No failed addons to save.")
 
         if self.duplicate_addons:
             duplicate_output_file = "data/duplicate_addons.csv"
             write_csv_to_file(duplicate_output_file, self.duplicate_addons, fieldnames)
-            print(f"[INFO] Saved {len(self.duplicate_addons)} duplicate addons to {duplicate_output_file}")
-        else:
-            print("[INFO] No duplicate addons to save.")
 
         print("\n[SUMMARY]")
         print(f"Total addons processed: {total_count + len(self.failed_addons) + len(self.duplicate_addons)}")
