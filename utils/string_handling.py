@@ -26,13 +26,14 @@ def handle_one_word(words, product_group, existing_codes):
     first_four = words[0][:4]
     last_two = words[0][-2:]
     last_char = words[0][-1]
+    random_combinations = get_all_random_combinations(words[0], 4, set())
+    
     potential_initials = [
         first_two + product_code,
         first_two + last_two,
         initials + last_char + product_code,
         first_four,
-        # first_three + product_group[:1].upper()
-    ]
+    ] + random_combinations
 
     for initials in potential_initials:
         if not is_duplicate(initials, existing_codes):
@@ -114,8 +115,8 @@ def get_initials(string, existing_codes, product_group):
     
     if initials and not is_duplicate(initials, existing_codes):
         existing_codes.add(initials)
-        print(f"Addon: {words} with item code: {initials}")
+        print(f"[INFO] Generated item code {initials} for addon: {' '.join(words)}")
         return initials.upper()
     else:
-        print(f"Could not generate unique initials for: {words}")
+        print(f"[WARNING] Could not generate unique initials for: {' '.join(words)}")
         return None
