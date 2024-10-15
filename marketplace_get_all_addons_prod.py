@@ -69,7 +69,7 @@ class MarketplaceAddonFetcher:
 
             if addon_key in self.parsed_addons_dict:
                 # Update existing entry with new application
-                self.parsed_addons_dict[addon_key]["Product Group"] += f", {application}"
+                self.parsed_addons_dict[addon_key]["Product Group"] += f'||{application}'
                 continue
 
             product_code = self.handle_addon_code(addon.get("name", ""), application)
