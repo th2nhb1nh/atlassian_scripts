@@ -1,5 +1,5 @@
 # services/jira_service.py
-from services.base_service import BaseService
+from services import BaseService
 from config import JiraConfig
 
 class JiraService(BaseService):

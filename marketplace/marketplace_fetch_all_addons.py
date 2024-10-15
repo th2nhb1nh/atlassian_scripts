@@ -2,9 +2,9 @@
 import json
 import re
 from collections import defaultdict
-from services.jira_service import JiraService
-from utils.file_utils import write_json_to_file, read_json
-from utils.string_handling import get_initials
+from ..services.jira_service import JiraService
+from ..utils.file_utils import write_json_to_file, read_json
+from ..utils.string_handling import get_initials
 
 class MarketplaceAddonFetcher:
     def __init__(self):

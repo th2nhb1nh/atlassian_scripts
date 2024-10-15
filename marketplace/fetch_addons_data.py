@@ -1,6 +1,12 @@
 # fetch_addons_data.py
 import json
 from pathlib import Path
+import sys
+
+# Add the root directory to the Python path
+root_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(root_dir))
+
 from services.jira_service import JiraService
 from utils.file_utils import write_json_to_file
 
@@ -24,7 +30,7 @@ class MarketplaceAddonFetcher:
 
         return addons
 
-    def save_addons_to_file(self, file_prefix):
+    def save_addons_to_file(self, output_path):
         applications = ["jira", "confluence"]
         all_addons = []
 
@@ -34,17 +40,17 @@ class MarketplaceAddonFetcher:
                 all_addons.append({
                     "Name": addon.get("name"),
                     "Id": addon.get("id"),
-                    "Link": f"{self.jira_service.marketplace_url}{addon["_links"]["alternate"]["href"]}",
+                    "Link": f"{self.jira_service.marketplace_url}{addon['_links']['alternate']['href']}",
                     "Summary": addon.get("summary"),
                     "Tag Line": addon.get("tagLine"),
                     "Product Group": application,
                     "Categories": [cat.get("name") for cat in addon["_embedded"]["categories"]]
                 })
 
-        output_file = f"{file_prefix}.json"
-        write_json_to_file(output_file, all_addons)
-        print(f"Saved {len(all_addons)} addons to {output_file}")
+        write_json_to_file(output_path, all_addons)
+        print(f"Saved {len(all_addons)} addons to {output_path}")
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()
-    fetcher.save_addons_to_file("data/raw_addon_details")
+    output_path = Path(__file__).resolve().parent / "data" / "raw_addon_details.json"
+    fetcher.save_addons_to_file(str(output_path))

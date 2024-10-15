@@ -4,8 +4,8 @@ import itertools
 import re
 import json
 from collections import defaultdict
-from services.jira_service import JiraService
-from utils.file_utils import write_json_to_file
+from ..services.jira_service import JiraService
+from ..utils.file_utils import write_json_to_file
 
 # String handling functions
 def encode_base64(string):

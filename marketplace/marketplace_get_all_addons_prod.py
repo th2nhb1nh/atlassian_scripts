@@ -2,6 +2,13 @@
 import csv
 import re
 from collections import defaultdict
+from pathlib import Path
+import sys
+
+# Add the root directory to the Python path
+root_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(root_dir))
+
 from services.jira_service import JiraService
 from utils.file_utils import write_csv_to_file, read_csv
 from utils.string_handling import get_initials
@@ -83,7 +90,7 @@ class MarketplaceAddonFetcher:
     def save_addons_to_csv(self, file_prefix, csv_file):
         applications = ["jira", "confluence", "bitbucket", "compass"]
 
-        self.load_existing_data(csv_file)
+        self.load_existing_data(existing_csv_file)
 
         for application in applications:
             addons = self.fetch_addons(application)
@@ -96,16 +103,16 @@ class MarketplaceAddonFetcher:
 
         fieldnames = ["Name", "Client Name", "Addon ID", "Addon Key", "Summary", "Product Group", "Item Code", "Link"]
 
-        output_file = f"{file_prefix}.csv"
-        write_csv_to_file(output_file, all_addons, fieldnames)
+        output_file = output_dir / "addon_details.csv"
+        write_csv_to_file(str(output_file), all_addons, fieldnames)
 
         if self.failed_addons:
-            failed_output_file = "data/failed_addons.csv"
-            write_csv_to_file(failed_output_file, self.failed_addons, fieldnames)
+            failed_output_file = output_dir / "failed_addons.csv"
+            write_csv_to_file(str(failed_output_file), self.failed_addons, fieldnames)
 
         if self.duplicate_addons:
-            duplicate_output_file = "data/duplicate_addons.csv"
-            write_csv_to_file(duplicate_output_file, self.duplicate_addons, fieldnames)
+            duplicate_output_file = output_dir / "duplicate_addons.csv"
+            write_csv_to_file(str(duplicate_output_file), self.duplicate_addons, fieldnames)
 
         print("\n[SUMMARY]")
         print(f"Total addons processed: {total_count + len(self.failed_addons) + len(self.duplicate_addons)}")
@@ -115,4 +122,6 @@ class MarketplaceAddonFetcher:
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()
-    fetcher.save_addons_to_csv("data/addon_details", "158Addons.csv")
+    output_dir = Path(__file__).resolve().parent / "data"
+    existing_csv_file = output_dir / "158Addons.csv"
+    fetcher.save_addons_to_csv(output_dir, existing_csv_file)
