@@ -1,7 +1,12 @@
+# add_worklog.py
 import requests
 import json
+import logging
 from datetime import datetime, timezone
 from config import JiraConfig
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class JiraWorklogManager:
     def __init__(self):
@@ -9,6 +14,9 @@ class JiraWorklogManager:
 
     def add_worklog(self, issue_key, comment, time_spent_seconds, visibility=None):
         url = f"{self.config.JIRA_URL}/rest/api/2/issue/{issue_key}/worklog"
+
+        if not isinstance(time_spent_seconds, int) or time_spent_seconds <= 0:
+            raise ValueError("time_spent_seconds must be a positive integer")
 
         payload = {
             "comment": comment,
@@ -25,50 +33,59 @@ class JiraWorklogManager:
                 "identifier" if visibility['type'] == 'group' else "value": visibility['value']
             }
 
-        response = requests.post(
-            url,
-            data=json.dumps(payload),
-            headers=self.config.HEADERS
-        )
-
-        return response.json()
+        try:
+            response = requests.post(
+                url,
+                data=json.dumps(payload),
+                headers=self.config.HEADERS
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error adding worklog to {issue_key}: {str(e)}")
+            return None
 
 if __name__ == "__main__":
     jira_manager = JiraWorklogManager()
-
-    # Specify the issue key you want to add the worklog to
     issue_key = "BTP-2"  # Replace with your actual issue key
 
-    # Example with group visibility
-    worklog_group = jira_manager.add_worklog(
-        issue_key,
-        "I did some work here (visible to a specific group).",
-        12000,  # 3 hours and 20 minutes in seconds
-        {"type": "group", "value": "fa2ee2a7-fc1f-49ad-a7d2-34e24c056377"}
-    )
+    try:
+        # Example with group visibility
+        worklog_group = jira_manager.add_worklog(
+            issue_key,
+            f"Working on issue {issue_key}",
+            12000,  # 3 hours and 20 minutes in seconds
+            {"type": "group", "value": "fa2ee2a7-fc1f-49ad-a7d2-34e24c056377"}
+        )
 
-    # Example with role visibility
-    worklog_role = jira_manager.add_worklog(
-        issue_key,
-        "I did some more work here (visible to a specific role).",
-        7200,  # 2 hours in seconds
-        {"type": "role", "value": "Administrators"}
-    )
+        # Example with role visibility
+        worklog_role = jira_manager.add_worklog(
+            issue_key,
+            f"Working on issue {issue_key}",
+            7200,  # 2 hours in seconds
+            {"type": "role", "value": "Administrators"}
+        )
 
-    # Example without visibility restrictions
-    worklog_no_visibility = jira_manager.add_worklog(
-        issue_key,
-        "I did some public work here.",
-        3600,  # 1 hour in seconds
-    )
+        # Example without visibility restrictions
+        worklog_no_visibility = jira_manager.add_worklog(
+            issue_key,
+            f"Working on issue {issue_key}",
+            3600,  # 1 hour in seconds
+        )
 
-    # Print the responses
-    print("Worklog with group visibility:")
-    print(json.dumps(worklog_group, sort_keys=True, indent=4, separators=(",", ": ")))
-    
-    print("\nWorklog with role visibility:")
-    print(json.dumps(worklog_role, sort_keys=True, indent=4, separators=(",", ": ")))
-    
-    print("\nWorklog without visibility restrictions:")
-    print(json.dumps(worklog_no_visibility, sort_keys=True, indent=4, separators=(",", ": ")))
-    
+        # Print the responses
+        for worklog, description in [
+            (worklog_group, "Worklog with group visibility"),
+            (worklog_role, "Worklog with role visibility"),
+            (worklog_no_visibility, "Worklog without visibility restrictions")
+        ]:
+            if worklog:
+                print(f"\n{description}:")
+                print(json.dumps(worklog, sort_keys=True, indent=4, separators=(",", ": ")))
+            else:
+                print(f"\n{description}: Failed to add worklog")
+
+    except ValueError as e:
+        logger.error(f"Invalid input: {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")

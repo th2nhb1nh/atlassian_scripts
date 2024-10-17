@@ -60,9 +60,10 @@ class MarketplaceAddonFetcher:
         
         for addon in sorted_addons:
             addon_key = addon.get("key")
+            addon_name = addon.get("name", "")
             parsed_addon = {
-                "Name": addon.get("name"),
-                "Client Name": self.truncate_client_name(addon.get("name")),
+                "Name": addon_name,
+                "Client Name": self.truncate_client_name(addon_name),
                 "Addon ID": addon.get("id"),
                 "Addon Key": addon_key,
                 "Summary": addon.get("summary"),
@@ -79,10 +80,19 @@ class MarketplaceAddonFetcher:
                 self.parsed_addons_dict[addon_key]["Product Group"] += f'||{application}'
                 continue
 
-            product_code = self.handle_addon_code(addon.get("name", ""), application)
+            product_code = self.handle_addon_code(addon_name, application)
             if not product_code:
                 self.failed_addons.append(parsed_addon)
                 continue
+            
+            if len(product_code) < 4:
+                print(f"[WARNING] Short product code generated for addon:")
+                print(f"  Addon Name: {addon_name}")
+                print(f"  Addon Key: {addon_key}")
+                print(f"  Product Code: {product_code}")
+                print(f"  Application: {application}")
+                print(f"  Generated Item Code: LIC-C-{product_code}-A")
+                print("  This code might need manual review.\n")
             
             parsed_addon["Item Code"] = f"LIC-C-{product_code}-A"
             self.parsed_addons_dict[addon_key] = parsed_addon

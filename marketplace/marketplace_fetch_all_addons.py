@@ -2,9 +2,16 @@
 import json
 import re
 from collections import defaultdict
-from ..services.jira_service import JiraService
-from ..utils.file_utils import write_json_to_file, read_json
-from ..utils.string_handling import get_initials
+from pathlib import Path
+import sys
+
+# Add the root directory to the Python path
+root_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(root_dir))
+
+from services.jira_service import JiraService
+from utils.file_utils import write_json_to_file, read_json
+from utils.string_handling import get_initials
 
 class MarketplaceAddonFetcher:
     def __init__(self):
@@ -91,15 +98,17 @@ class MarketplaceAddonFetcher:
 
         # Break the output into new files per chunk_size records
         for i in range(0, total_count, chunk_size):
-            output_file = f"{file_prefix}_{i // chunk_size + 1}.json"
-            write_json_to_file(output_file, all_addons[i:i + chunk_size])
+            output_file = output_dir / f"addon_details_{i // chunk_size + 1}.json"
+            write_json_to_file(str(output_file), all_addons[i:i + chunk_size])
             print(f"Saved {len(all_addons[i:i + chunk_size])} addons to {output_file}")
 
         # Save failed addons to a new file
-        failed_output_file = "data/failed_addons.json"
-        write_json_to_file(failed_output_file, self.failed_addons)
+        failed_output_file = output_dir / "failed_addons.json"
+        write_json_to_file(str(failed_output_file), self.failed_addons)
         print(f"Saved {len(self.failed_addons)} failed addons to {failed_output_file}")
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()
-    fetcher.save_addons_to_files("data/addon_details", chunk_size=100)
+    output_dir = Path(__file__).resolve().parent / "data"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    fetcher.save_addons_to_files(output_dir, chunk_size=100)

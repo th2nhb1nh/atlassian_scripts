@@ -4,8 +4,15 @@ import itertools
 import re
 import json
 from collections import defaultdict
-from ..services.jira_service import JiraService
-from ..utils.file_utils import write_json_to_file
+from pathlib import Path
+import sys
+
+# Add the root directory to the Python path
+root_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(root_dir))
+
+from services.jira_service import JiraService
+from utils.file_utils import write_json_to_file
 
 # String handling functions
 def encode_base64(string):
@@ -175,7 +182,7 @@ class MarketplaceAddonFetcher:
         else:
             print("No duplicate product codes found.")
 
-    def save_addons_to_files(self, output_file, failed_output_file):
+    def save_addons_to_files(self, output_dir):
         applications = ["jira", "confluence"]
         all_addons = []
 
@@ -189,12 +196,16 @@ class MarketplaceAddonFetcher:
         self.check_duplicates(all_addons)
 
         total_count = len(all_addons)
-        write_json_to_file(output_file, all_addons)
+        output_file = output_dir / "addon_details.json"
+        write_json_to_file(str(output_file), all_addons)
         print(f"Saved {total_count} addons to {output_file}")
 
-        write_json_to_file(failed_output_file, self.failed_addons)
+        failed_output_file = output_dir / "failed_addons.json"
+        write_json_to_file(str(failed_output_file), self.failed_addons)
         print(f"Saved {len(self.failed_addons)} failed addons to {failed_output_file}")
 
 if __name__ == "__main__":
     fetcher = MarketplaceAddonFetcher()
-    fetcher.save_addons_to_files("data/addon_details.json", "data/failed_addons.json")
+    output_dir = Path(__file__).resolve().parent / "data"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    fetcher.save_addons_to_files(output_dir)
