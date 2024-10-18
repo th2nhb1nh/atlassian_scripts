@@ -85,7 +85,7 @@ class MarketplaceAddonFetcher:
                 self.failed_addons.append(parsed_addon)
                 continue
             
-            if len(product_code) < 4:
+            if len(product_code) != 4:
                 print(f"[WARNING] Short product code generated for addon:")
                 print(f"  Addon Name: {addon_name}")
                 print(f"  Addon Key: {addon_key}")
