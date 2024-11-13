@@ -16,6 +16,10 @@ class JiraService(BaseService):
             return f"{self.marketplace_url}/{route}"
         return f"{self.jira_url}/rest/api/2/{route}"
 
+    def create_issue(self, payload):
+        url = self._build_url("issue")
+        return self.post(url, json=payload, headers=self.headers)
+
     def create_customer(self, email, name):
         url = self._build_url("rest/servicedeskapi/customer", use_original_host=True)
         body = {
