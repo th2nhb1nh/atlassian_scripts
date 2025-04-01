@@ -54,3 +54,11 @@ class JiraService(BaseService):
     def get_addon_detail(self, addon_key):
         url = self._build_url(f"rest/2/addons/{addon_key}", use_marketplace=True)
         return self.get(url, headers=self.headers)
+
+    def update_issue(self, issue_key, payload):
+        url = self._build_url(f"issue/{issue_key}")
+        return self.put(url, json=payload, headers=self.headers)
+
+    def get_issue(self, issue_key):
+        url = self._build_url(f"issue/{issue_key}")
+        return self.get(url, headers=self.headers)
