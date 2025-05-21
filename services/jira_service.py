@@ -62,3 +62,19 @@ class JiraService(BaseService):
     def get_issue(self, issue_key):
         url = self._build_url(f"issue/{issue_key}")
         return self.get(url, headers=self.headers)
+    
+    def add_comment(self, issue_key, payload):
+        url = self._build_url(f"issue/{issue_key}/comment")
+        return self.post(url, json=payload, headers=self.headers)
+    
+    def get_comments(self, issue_key):
+        url = self._build_url(f"issue/{issue_key}/comment")
+        return self.get(url, headers=self.headers)
+    
+    def get_comment(self, issue_key, comment_id):
+        url = self._build_url(f"issue/{issue_key}/comment/{comment_id}")
+        return self.get(url, headers=self.headers)
+    
+    def update_comment(self, issue_key, comment_id, payload):
+        url = self._build_url(f"issue/{issue_key}/comment/{comment_id}")
+        return self.put(url, json=payload, headers=self.headers)
